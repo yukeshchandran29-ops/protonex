@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Log in — ProtoNex</title><meta name="description" content="Log in to your ProtoNex account."><link rel="stylesheet" href="styles.css"></head>
+<body>
+<header class="site-header"><div class="nav-inner">
+<a class="wordmark" href="index.html">PROTONEX</a>
+<nav class="site-nav"><a href="index.html">Home</a><a href="metal-cutting.html">Metal Cutting</a><a href="printing-3d.html">3D Printing</a><a href="signup.html" class="nav-cta">Create account ↗</a></nav>
+<button class="menu" aria-label="Open navigation" aria-expanded="false">☰</button>
+</div></header>
+
+<main class="auth-page">
+<div class="auth-shell" style="--accent:var(--metal)">
+<section class="auth-brand">
+<div><div class="auth-mark">NX</div><div class="eyebrow" style="margin-top:28px">ProtoNex / Workspace</div>
+<h1>Welcome<br>back.</h1>
+<p>Pick up where you left off. Manage quotes, upload designs and keep every fabrication project in one place.</p></div>
+<div class="auth-benefits">
+<div class="auth-benefit"><span class="auth-dot"></span><div><b>Track every quote</b>Keep pricing, revisions and status together.</div></div>
+<div class="auth-benefit"><span class="auth-dot"></span><div><b>Save your designs</b>Reuse project files and specifications.</div></div>
+<div class="auth-benefit"><span class="auth-dot"></span><div><b>One account, two processes</b>Metal cutting and 3D printing in the same workspace.</div></div>
+</div>
+</section>
+
+<section class="auth-form-wrap"><form class="auth-form" id="loginForm">
+<div class="eyebrow">Account access</div><h2>Log in to ProtoNex</h2><p class="auth-sub">Enter your details to continue to your workspace.</p>
+<div class="auth-error" id="loginError">Please enter a valid email and password.</div>
+<div class="auth-form-grid">
+<div class="auth-field"><label for="loginEmail">Email address</label><input id="loginEmail" type="email" autocomplete="email" placeholder="you@company.com" required></div>
+<div class="auth-field"><label for="loginPassword">Password</label><div class="password-row"><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="6" required><button type="button" class="password-toggle" data-target="loginPassword">Show</button></div></div>
+<div class="auth-meta"><label class="remember"><input type="checkbox"> Remember me</label><a class="auth-link" href="#">Forgot password?</a></div>
+<button class="btn btn-light auth-submit" type="submit">Log in ↗</button>
+</div>
+<div class="divider">or continue with</div>
+<div class="social-auth"><button type="button" class="social-btn">Google</button><button type="button" class="social-btn">Microsoft</button></div>
+<p class="auth-bottom">Don't have an account? <a class="auth-link" href="signup.html">Create one</a></p>
+</form></section>
+</div></main>
+<script src="auth.js"></script></body></html>

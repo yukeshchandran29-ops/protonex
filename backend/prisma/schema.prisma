@@ -1,0 +1,472 @@
+// ProtoNex production database schema
+// "Where Ideas Become Prototypes."
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────────────────────────────────
+
+enum Role {
+  CUSTOMER
+  ENGINEER
+  ADMIN
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+  COMPLETED
+}
+
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETE
+  FAILED
+}
+
+enum QuoteStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  NEEDS_CUSTOMER_INFO
+  APPROVED
+  REJECTED
+  EXPIRED
+  ORDERED
+}
+
+enum ManufacturingProcess {
+  FDM_3D_PRINTING
+  SLA_3D_PRINTING
+  SLS_3D_PRINTING
+  CNC_MACHINING
+  SHEET_METAL
+  LASER_CUTTING
+  INJECTION_MOLDING
+}
+
+enum DeliverySpeed {
+  STANDARD
+  EXPRESS
+  RUSH
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum ProductionStatus {
+  QUEUED
+  IN_PRODUCTION
+  QUALITY_CHECK
+  READY_TO_SHIP
+  COMPLETE
+}
+
+enum ShippingStatus {
+  NOT_SHIPPED
+  SHIPPED
+  IN_TRANSIT
+  DELIVERED
+}
+
+enum DFMVerdict {
+  PASS
+  WARNING
+  FAIL
+  NOT_ANALYZED
+}
+
+enum EmailStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// CORE ENTITIES
+// ─────────────────────────────────────────────────────────────────────────
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users    User[]
+  projects Project[]
+
+  @@index([name])
+}
+
+model User {
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  name                  String
+  passwordHash          String
+  role                  Role      @default(CUSTOMER)
+  companyId             String?
+  emailVerified         Boolean   @default(false)
+  emailVerifyToken       String?  @unique
+  emailVerifyExpires     DateTime?
+  passwordResetToken     String?  @unique
+  passwordResetExpires   DateTime?
+  failedLoginAttempts    Int       @default(0)
+  lockedUntil            DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  company        Company?        @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  projects       Project[]
+  cadFiles       CADFile[]
+  quotesAsCustomer Quote[]       @relation("QuoteCustomer")
+  orders         Order[]
+  notifications  Notification[]
+  auditLogs      AuditLog[]
+  quoteStatusChanges QuoteStatusHistory[]
+  refreshTokens  RefreshToken[]
+
+  @@index([companyId])
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Project {
+  id            String        @id @default(cuid())
+  projectNumber String        @unique
+  name          String
+  description   String?
+  status        ProjectStatus @default(ACTIVE)
+  userId        String
+  companyId     String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company  Company?  @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  cadFiles CADFile[]
+  quotes   Quote[]
+
+  @@index([userId])
+  @@index([companyId])
+}
+
+model CADFile {
+  id                String           @id @default(cuid())
+  originalName      String
+  storageKey        String           @unique
+  storageUrl        String?
+  fileType          String
+  fileSize          Int
+  checksum          String
+  projectId         String
+  uploadedBy        String
+  processingStatus  ProcessingStatus @default(PENDING)
+  geometryStatus    ProcessingStatus @default(PENDING)
+  geometryMetadata  Json?
+  createdAt         DateTime         @default(now())
+
+  project           Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploader          User               @relation(fields: [uploadedBy], references: [id])
+  geometryAnalysis  GeometryAnalysis?
+  dfmAnalysis       DFMAnalysis?
+  quoteItems        QuoteItem[]
+  orderItems        OrderItem[]
+
+  @@index([projectId])
+  @@index([uploadedBy])
+}
+
+model GeometryAnalysis {
+  id               String   @id @default(cuid())
+  cadFileId        String   @unique
+  volume           Float?
+  surfaceArea      Float?
+  boundingBoxX     Float?
+  boundingBoxY     Float?
+  boundingBoxZ     Float?
+  faceCount        Int?
+  solidCount       Int?
+  triangleCount    Int?
+  watertight       Boolean?
+  complexityScore  Float?
+  analysisVersion  String
+  createdAt        DateTime @default(now())
+
+  cadFile CADFile @relation(fields: [cadFileId], references: [id], onDelete: Cascade)
+}
+
+model DFMAnalysis {
+  id          String     @id @default(cuid())
+  cadFileId   String     @unique
+  thinWalls        DFMVerdict @default(NOT_ANALYZED)
+  tinyHoles        DFMVerdict @default(NOT_ANALYZED)
+  overhangs        DFMVerdict @default(NOT_ANALYZED)
+  aspectRatio      DFMVerdict @default(NOT_ANALYZED)
+  sharpCorners     DFMVerdict @default(NOT_ANALYZED)
+  minFeatureSize   DFMVerdict @default(NOT_ANALYZED)
+  accessibility    DFMVerdict @default(NOT_ANALYZED)
+  toleranceRisk    DFMVerdict @default(NOT_ANALYZED)
+  explanations     Json?
+  createdAt        DateTime   @default(now())
+
+  cadFile CADFile @relation(fields: [cadFileId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// PRICING CONFIGURATION (admin-editable, versioned via snapshots on Quote)
+// ─────────────────────────────────────────────────────────────────────────
+
+model Material {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  process         ManufacturingProcess
+  costPerKg       Float
+  density         Float
+  wasteFactor     Float    @default(1.1)
+  minimumCharge   Float    @default(0)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ProcessRate {
+  id                String               @id @default(cuid())
+  process           ManufacturingProcess @unique
+  hourlyRate        Float
+  setupRate         Float
+  energyRate        Float    @default(0)
+  minimumOrderValue Float    @default(0)
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model FinishingOption {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  costFlat  Float    @default(0)
+  costPerCm2 Float   @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DeliveryOption {
+  id          String        @id @default(cuid())
+  speed       DeliverySpeed @unique
+  multiplier  Float         @default(1.0)
+  flatFee     Float         @default(0)
+  leadTimeDays Int
+  active      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// QUOTES & ORDERS
+// ─────────────────────────────────────────────────────────────────────────
+
+model Quote {
+  id             String      @id @default(cuid())
+  quoteNumber    String      @unique
+  projectId      String
+  customerId     String
+  status         QuoteStatus @default(DRAFT)
+  process        ManufacturingProcess
+  material       String
+  quantity       Int
+  finish         String?
+  tolerance      String?
+  deliverySpeed  DeliverySpeed @default(STANDARD)
+
+  basePrice      Float?
+  materialCost   Float?
+  machineCost    Float?
+  setupCost      Float?
+  finishingCost  Float?
+  rushCost       Float?
+  discount       Float       @default(0)
+  estimatedPrice Float?
+  finalPrice     Float?
+  currency       String      @default("USD")
+  leadTime       Int?
+
+  // Immutable snapshot of the pricing rules used at calculation time.
+  // Critical: if admin pricing changes tomorrow, this quote must not change.
+  pricingSnapshot Json?
+
+  internalNotes  String?
+  customerNotes  String?
+
+  acceptedAt     DateTime?
+  acceptedBy     String?
+  approvedAt     DateTime?
+  rejectedAt     DateTime?
+  expiresAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project       Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  customer      User                 @relation("QuoteCustomer", fields: [customerId], references: [id], onDelete: Cascade)
+  items         QuoteItem[]
+  order         Order?
+  statusHistory QuoteStatusHistory[]
+
+  @@index([projectId])
+  @@index([customerId])
+  @@index([status])
+}
+
+model QuoteItem {
+  id                 String  @id @default(cuid())
+  quoteId            String
+  cadFileId          String
+  quantity           Int
+  unitPrice          Float
+  totalPrice         Float
+  geometryAnalysisId String?
+
+  quote   Quote   @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  cadFile CADFile @relation(fields: [cadFileId], references: [id])
+
+  @@index([quoteId])
+  @@index([cadFileId])
+}
+
+model QuoteStatusHistory {
+  id        String      @id @default(cuid())
+  quoteId   String
+  oldStatus QuoteStatus?
+  newStatus QuoteStatus
+  changedBy String?
+  note      String?
+  createdAt DateTime    @default(now())
+
+  quote   Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  changer User? @relation(fields: [changedBy], references: [id])
+
+  @@index([quoteId])
+}
+
+model Order {
+  id                String           @id @default(cuid())
+  orderNumber       String           @unique
+  quoteId           String           @unique
+  customerId        String
+  status            OrderStatus      @default(PENDING)
+  paymentStatus     PaymentStatus    @default(UNPAID)
+  productionStatus  ProductionStatus @default(QUEUED)
+  shippingStatus    ShippingStatus   @default(NOT_SHIPPED)
+  trackingNumber    String?
+  estimatedDelivery DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  quote    Quote       @relation(fields: [quoteId], references: [id])
+  customer User        @relation(fields: [customerId], references: [id])
+  items    OrderItem[]
+
+  @@index([customerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  cadFileId String
+  quantity  Int
+  price     Float
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  cadFile CADFile @relation(fields: [cadFileId], references: [id])
+
+  @@index([orderId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// NOTIFICATIONS / EMAIL / AUDIT
+// ─────────────────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+}
+
+model EmailLog {
+  id           String      @id @default(cuid())
+  recipient    String
+  template     String
+  status       EmailStatus @default(QUEUED)
+  providerId   String?
+  idempotencyKey String?   @unique
+  metadata     Json?
+  sentAt       DateTime?
+  errorMessage String?
+  attempts     Int         @default(0)
+  createdAt    DateTime    @default(now())
+
+  @@index([recipient])
+  @@index([status])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([userId])
+}

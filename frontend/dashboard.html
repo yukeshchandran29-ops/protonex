@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard — ProtoNex</title>
+<meta name="description" content="ProtoNex workspace dashboard for projects, quotes, CAD files and orders.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard-page">
+<header class="site-header"><div class="nav-inner">
+<a class="wordmark" href="index.html">PROTONEX</a>
+<nav class="site-nav">
+<a href="dashboard.html" class="active">Dashboard</a><a href="index.html">Home</a><a href="metal-cutting.html">Metal Cutting</a><a href="printing-3d.html">3D Printing</a><a href="#" id="dashQuoteNav" class="nav-cta">New quote ↗</a>
+</nav>
+<button class="menu" aria-label="Open navigation" aria-expanded="false">☰</button>
+</div></header>
+
+<main>
+<section class="dash-shell container">
+  <aside class="dash-sidebar">
+    <div class="dash-profile">
+      <div class="avatar">YC</div><div><strong>Prototype Lab</strong><span>Workspace</span></div>
+    </div>
+    <nav class="dash-nav" aria-label="Dashboard navigation">
+      <button class="dash-tab active" data-tab="overview"><span>⌂</span> Overview</button>
+      <button class="dash-tab" data-tab="projects"><span>◈</span> Projects</button>
+      <button class="dash-tab" data-tab="quotes"><span>◇</span> Quotes <b id="quoteCountBadge">2</b></button>
+      <button class="dash-tab" data-tab="files"><span>▧</span> CAD Files</button>
+      <button class="dash-tab" data-tab="orders"><span>↗</span> Orders</button>
+    </nav>
+    <div class="dash-side-card"><div class="eyebrow">Need a part?</div><b>Start a new quote</b><p>Upload your CAD and we'll help match the right process.</p><button class="btn btn-light btn-small" id="sideNewQuote">New quote ↗</button></div>
+    <a class="dash-signout" href="login.html">Sign out</a>
+  </aside>
+
+  <section class="dash-content">
+    <div class="dash-mobile-title"><div><div class="eyebrow">ProtoNex workspace</div><h1>Good afternoon.</h1></div><button class="btn btn-light btn-small" id="mobileNewQuote">New quote ↗</button></div>
+
+    <div class="dash-panel active" id="panel-overview">
+      <div class="dash-hero"><div><div class="eyebrow">Workspace overview</div><h1>Build, quote, <span class="gradient-text">ship.</span></h1><p>Everything your prototype needs, in one place.</p></div><div class="dash-hero-orbit"><span></span><i>NX</i></div></div>
+      <div class="metric-grid">
+        <button class="metric" data-jump="projects"><span>Active projects</span><strong id="metricProjects">4</strong><em>2 due this week →</em></button>
+        <button class="metric" data-jump="quotes"><span>Open quotes</span><strong id="metricQuotes">2</strong><em>1 needs review →</em></button>
+        <button class="metric" data-jump="files"><span>CAD files</span><strong id="metricFiles">18</strong><em>3 uploaded recently →</em></button>
+        <button class="metric" data-jump="orders"><span>In production</span><strong id="metricOrders">2</strong><em>Next shipment Aug 31 →</em></button>
+      </div>
+      <div class="dash-columns">
+        <div class="dash-card"><div class="dash-card-head"><div><div class="eyebrow">Recent activity</div><h2>Latest updates</h2></div><button class="text-btn" data-jump="orders">View all →</button></div><div id="activityList" class="activity-list"></div></div>
+        <div class="dash-card"><div class="dash-card-head"><div><div class="eyebrow">Quick start</div><h2>What are you making?</h2></div></div><div class="quick-grid"><button class="quick-card" data-process="Metal Cutting"><span>01</span><b>Metal part</b><small>Laser / waterjet / plasma</small></button><button class="quick-card" data-process="3D Printing"><span>02</span><b>3D prototype</b><small>FDM / resin / SLS</small></button></div></div>
+      </div>
+    </div>
+
+    <div class="dash-panel" id="panel-projects"><div class="panel-title"><div><div class="eyebrow">Your work</div><h1>Projects</h1><p>Track prototypes from first file to finished part.</p></div><button class="btn btn-light btn-small" id="newProject">+ New project</button></div><div class="filter-row"><button class="filter active" data-project-filter="all">All</button><button class="filter" data-project-filter="active">Active</button><button class="filter" data-project-filter="review">Needs review</button><button class="filter" data-project-filter="complete">Complete</button></div><div class="project-grid" id="projectGrid"></div></div>
+
+    <div class="dash-panel" id="panel-quotes"><div class="panel-title"><div><div class="eyebrow">Pricing</div><h1>Quotes</h1><p>Review estimates and approve the next build.</p></div><button class="btn btn-light btn-small" id="quotesNew">+ New quote</button></div><div class="quote-table" id="quoteTable"></div></div>
+
+    <div class="dash-panel" id="panel-files"><div class="panel-title"><div><div class="eyebrow">Design library</div><h1>CAD Files</h1><p>Keep your models, drawings and revisions together.</p></div><label class="btn btn-light btn-small file-upload-btn">Upload CAD ↥<input id="cadUpload" type="file" multiple accept=".step,.stp,.stl,.obj,.iges,.igs,.dxf,.dwg,.3mf,.zip" hidden></label></div><div class="upload-zone" id="uploadZone"><div class="upload-icon">↑</div><b>Drop CAD files here</b><span>STEP, STL, IGES, DXF, 3MF and more</span></div><div class="file-grid" id="fileGrid"></div></div>
+
+    <div class="dash-panel" id="panel-orders"><div class="panel-title"><div><div class="eyebrow">Production</div><h1>Orders</h1><p>See what's in production, shipping and delivered.</p></div></div><div class="order-list" id="orderList"></div></div>
+  </section>
+</section>
+</main>
+
+<div class="dash-toast" id="dashToast"></div>
+<div class="modal" id="dashboardQuoteModal" aria-modal="true" role="dialog" aria-labelledby="quoteModalTitle"><div class="modal-card dash-modal-card quote-builder">
+<div class="modal-head"><div><div class="eyebrow">CAD → Quote</div><h2 id="quoteModalTitle">Build your quote request.</h2><p class="modal-sub">Upload the design, configure production, then submit for a DFM-reviewed quote.</p></div><button class="close" id="dashModalClose" aria-label="Close">×</button></div>
+<div class="quote-steps"><div class="qstep active"><b>01</b><span>CAD</span></div><div class="qline"></div><div class="qstep"><b>02</b><span>Build</span></div><div class="qline"></div><div class="qstep"><b>03</b><span>Review</span></div></div>
+<form id="dashboardQuoteForm">
+<section class="quote-stage active" data-stage="1">
+  <div class="quote-drop" id="quoteDrop"><input id="quoteCadInput" type="file" multiple accept=".step,.stp,.stl,.obj,.iges,.igs,.dxf,.dwg,.3mf,.zip" hidden><div class="upload-icon">↑</div><b>Drop your CAD files here</b><span>STEP, STP, STL, IGES, DXF, DWG, 3MF or ZIP · up to 100 MB each</span><button type="button" class="btn btn-ghost btn-small" id="browseQuoteCad">Browse files</button></div>
+  <div id="quoteFileList" class="quote-file-list"></div>
+  <div class="form-grid"><div class="field"><label>Project name</label><input name="project" required placeholder="e.g. Enclosure V2"></div><div class="field"><label>Quantity</label><input name="quantity" type="number" min="1" max="10000" value="1" required></div></div>
+</section>
+<section class="quote-stage" data-stage="2">
+  <div class="form-grid"><div class="field"><label>Manufacturing process</label><select name="process" id="quoteProcess"><option value="3D Printing">3D Printing</option><option value="Metal Cutting">Metal Cutting</option></select></div><div class="field"><label>Material</label><select name="material" id="quoteMaterial"></select></div><div class="field"><label>Finish</label><select name="finish"><option>As manufactured</option><option>Bead blasted</option><option>Anodized</option><option>Powder coated</option><option>Vapor smoothed</option></select></div><div class="field"><label>Target delivery</label><select name="delivery"><option>Standard — 5–7 business days</option><option>Rush — 3–4 business days</option><option>Express — 1–2 business days</option></select></div><div class="field"><label>Tolerance</label><select name="tolerance"><option>Standard</option><option>Precision ±0.10 mm</option><option>Precision ±0.05 mm</option></select></div><div class="field"><label>Part complexity</label><select name="complexity"><option value="1">Standard geometry</option><option value="1.25">Complex geometry</option><option value="1.5">Highly complex / tight features</option></select></div><div class="field full"><label>Production notes</label><textarea name="notes" rows="3" placeholder="Critical dimensions, threads, inserts, inspection requirements, packaging…"></textarea></div></div>
+</section>
+<section class="quote-stage" data-stage="3">
+  <div class="geometry-summary" id="geometrySummary"><div><span>Analyzed</span><b>0/0 files</b></div><div><span>Model volume</span><b>—</b></div><div><span>Surface area</span><b>—</b></div><div><span>Largest envelope</span><b>—</b></div></div><div class="quote-review-grid"><div class="review-card"><div class="eyebrow">Request summary</div><div id="quoteReview"></div></div><div class="estimate-card"><div class="eyebrow">Indicative estimate</div><strong id="quoteEstimate">₹0</strong><span id="quoteEstimateMeta">Final price follows CAD/DFM review.</span><div class="estimate-bar"><span id="estimateBar"></span></div></div></div>
+  <div class="quote-notice"><b>What happens next?</b><span>ProtoNex reviews the uploaded geometry for manufacturability, confirms material/finish, and returns a final quote in your workspace.</span></div>
+</section>
+<div class="form-foot quote-nav"><button type="button" class="btn btn-ghost" id="dashModalCancel">Cancel</button><div class="quote-nav-right"><button type="button" class="btn btn-ghost" id="quoteBack" hidden>← Back</button><button type="button" class="btn btn-light" id="quoteNext">Continue →</button><button type="submit" class="btn btn-light" id="quoteSubmit" hidden>Submit quote request ↗</button></div></div>
+</form>
+</div></div>
+<script src="api-client.js"></script>
+<script src="dashboard.js"></script>
+</body></html>

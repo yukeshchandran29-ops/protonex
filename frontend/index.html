@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProtoNex — Fabrication, without the friction</title>
+<meta name="description" content="Metal cutting and 3D printing from one modern fabrication shop.">
+<link rel="stylesheet" href="styles.css"></head>
+<body>
+<header class="site-header"><div class="nav-inner">
+<a class="wordmark" href="index.html">PROTONEX</a>
+<nav class="site-nav"><a href="index.html" class="active">Home</a><a href="metal-cutting.html">Metal Cutting</a><a href="printing-3d.html">3D Printing</a><a href="#how">How it works</a><a href="dashboard.html">Dashboard</a><a href="login.html">Log in</a><a href="signup.html">Sign up</a><a href="#" class="nav-cta" data-quote="Metal Cutting">Get a quote ↗</a></nav>
+<button class="menu" aria-label="Open navigation" aria-expanded="false">☰</button>
+</div></header>
+<main>
+<section class="hero-home"><div class="container hero-copy">
+<div class="kicker">Digital fabrication • built for makers</div>
+<h1>Where Ideas Become <span class="gradient-text">Prototypes.</span></h1>
+<p>One shop for subtractive and additive fabrication. Upload a design, choose the process, and get moving without the usual back-and-forth.</p>
+<div class="hero-actions"><a class="btn btn-light" href="#choose">Choose a process ↓</a><a class="btn btn-ghost" href="#" data-quote="Metal Cutting">Start a quote ↗</a></div>
+<div class="stat-strip"><div class="stat"><strong>1–5 days</strong><span>Typical turnaround</span></div><div class="stat"><strong>±0.1 mm</strong><span>Metal cutting tolerance</span></div><div class="stat"><strong>No minimums</strong><span>Prototype-friendly</span></div></div>
+</div></section>
+
+<section class="choose container" id="choose"><div class="section-head"><div><div class="eyebrow">Pick your path</div><h2>Two processes. One workflow.</h2></div><p>Not sure which is right? Start with the geometry: remove material from a sheet, or build it layer by layer.</p></div>
+<div class="choice-grid">
+<a class="choice metal" href="metal-cutting.html"><div class="choice-art"><div class="plate"></div></div><div class="choice-content"><div class="choice-tag">01 • Subtractive</div><h3>Metal Cutting</h3><p>Laser, plasma and waterjet for steel, aluminum, stainless, brass and copper. Clean outlines, production-ready parts.</p><span class="choice-link">Explore metal cutting <span>→</span></span></div></a>
+<a class="choice print" href="printing-3d.html"><div class="choice-art"><div class="plate"></div></div><div class="choice-content"><div class="choice-tag">02 • Additive</div><h3>3D Printing</h3><p>FDM, resin and SLS for prototypes, functional parts and complex geometry that traditional cutting can't make.</p><span class="choice-link">Explore 3D printing <span>→</span></span></div></a>
+</div></section>
+
+<section class="trust container"><div class="trust-grid">
+<div class="trust-card"><b>Quote in minutes</b><span>Give us the basics and we can start pricing.</span></div>
+<div class="trust-card"><b>Built for iteration</b><span>Prototype one, then scale when the design is ready.</span></div>
+<div class="trust-card"><b>Practical tolerances</b><span>Clear specs before anything hits the machine.</span></div>
+<div class="trust-card"><b>Human support</b><span>Questions about process or material? Ask.</span></div>
+</div></section>
+
+<section class="section" id="how"><div class="container"><div class="label">How it works</div><h2>From CAD file to finished part.</h2><div class="steps" style="--accent:var(--metal)">
+<div class="step"><span class="step-num">01</span><h3>Send your design</h3><p>Upload a 2D profile or 3D model and tell us what you need.</p></div>
+<div class="step"><span class="step-num">02</span><h3>Choose the process</h3><p>We help match geometry, material and finish to the right method.</p></div>
+<div class="step"><span class="step-num">03</span><h3>Approve the quote</h3><p>Review pricing, timing and specs before production starts.</p></div>
+<div class="step"><span class="step-num">04</span><h3>Make & deliver</h3><p>We fabricate, finish and prepare your parts for pickup or shipping.</p></div>
+</div></div></section>
+</main>
+<footer class="site-footer container"><span>© 2026 ProtoNex</span><span>Made for prototypes, products & everything between.</span></footer>
+<div class="modal" id="quoteModal" aria-modal="true" role="dialog"><div class="modal-card">
+<div class="modal-head"><div><div class="eyebrow">Fast quote</div><h2>Tell us what you're making.</h2></div><button class="close" aria-label="Close">×</button></div>
+<form id="quoteForm"><div class="form-grid"><div class="field"><label>Name</label><input id="quoteName" name="name" required></div><div class="field"><label>Email</label><input name="email" type="email" required></div><div class="field"><label>Process</label><select id="quoteType" name="type"><option>Metal Cutting</option><option>3D Printing</option></select></div><div class="field"><label>Quantity</label><input name="quantity" type="number" min="1" value="1"></div><div class="field full"><label>Material / finish</label><input name="material" placeholder="e.g. 304 stainless, black PLA"></div><div class="field full"><label>CAD file</label><div class="drop"><strong>Drop your file here</strong><span>or choose one below</span><input id="quoteFile" type="file" style="margin-top:10px"></div></div><div class="field full"><label>Notes</label><textarea name="notes" rows="3" placeholder="Dimensions, tolerances, deadline, finish…"></textarea></div></div><div class="form-foot"><button type="button" class="btn btn-ghost close">Cancel</button><button class="btn btn-light">Continue to email ↗</button></div></form>
+</div></div>
+<script src="script.js"></script></body></html>

@@ -1,0 +1,13 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Quotation Console — ProtoNex</title><meta name="description" content="ProtoNex internal quotation review console."><link rel="stylesheet" href="styles.css"></head><body>
+<header class="site-header"><div class="nav-inner"><a class="wordmark" href="index.html">PROTONEX</a><nav class="site-nav"><a href="dashboard.html">Customer Dashboard</a><a href="index.html">Website</a><a href="#" class="nav-cta" id="logoutBtn">Admin ↗</a></nav><button class="menu" aria-label="Open navigation" aria-expanded="false">☰</button></div></header>
+<main class="admin-page">
+  <div class="admin-top"><div><div class="eyebrow">ProtoNex / Internal</div><h1>Quotation console</h1><p>Review CAD geometry, tune the estimate, approve pricing and prepare the final customer quote.</p></div><div class="admin-badge"><i></i> Engineering workspace</div></div>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <input id="adminSearch" class="admin-search" placeholder="Search quotes, projects…" autocomplete="off">
+      <div class="admin-filters"><button class="admin-filter active" data-filter="All">All</button><button class="admin-filter" data-filter="Submitted">Submitted</button><button class="admin-filter" data-filter="Needs review">Review</button><button class="admin-filter" data-filter="Approved">Approved</button><button class="admin-filter" data-filter="Rejected">Rejected</button></div>
+      <div id="adminQuoteList" class="admin-quote-list"></div>
+    </aside>
+    <section class="admin-detail" id="adminDetail"><div class="admin-empty"><div><div class="auth-mark">NX</div><h2>Select a quotation</h2><p>Choose a submission from the queue to inspect geometry and finalize pricing.</p></div></div></section>
+  </div>
+</main><div id="adminToast" class="admin-toast"></div><script src="api-client.js"></script><script src="admin.js"></script></body></html>

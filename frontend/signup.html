@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create account — ProtoNex</title><meta name="description" content="Create your ProtoNex fabrication workspace."><link rel="stylesheet" href="styles.css"></head>
+<body>
+<header class="site-header"><div class="nav-inner">
+<a class="wordmark" href="index.html">PROTONEX</a>
+<nav class="site-nav"><a href="index.html">Home</a><a href="metal-cutting.html">Metal Cutting</a><a href="printing-3d.html">3D Printing</a><a href="dashboard.html">Dashboard</a><a href="login.html" class="nav-cta">Log in ↗</a></nav>
+<button class="menu" aria-label="Open navigation" aria-expanded="false">☰</button>
+</div></header>
+
+<main class="auth-page">
+<div class="auth-shell" style="--accent:var(--print)">
+<section class="auth-brand">
+<div><div class="auth-mark">NX</div><div class="eyebrow" style="margin-top:28px">ProtoNex / Prototype Fabrication OS</div>
+<h1>Make more.<br><span class="gradient-text">Faster.</span></h1>
+<p>Create an account to turn quotes, CAD files and production details into one clean workflow.</p></div>
+<div class="auth-benefits">
+<div class="auth-benefit"><span class="auth-dot"></span><div><b>Free to get started</b>Create your workspace without a commitment.</div></div>
+<div class="auth-benefit"><span class="auth-dot"></span><div><b>Quote faster</b>Save company and material preferences for repeat jobs.</div></div>
+<div class="auth-benefit"><span class="auth-dot"></span><div><b>Built for teams</b>Keep project context accessible when work moves from prototype to production.</div></div>
+</div>
+</section>
+
+<section class="auth-form-wrap"><form class="auth-form" id="signupForm">
+<div class="eyebrow">New workspace</div><h2>Create your account</h2><p class="auth-sub">Set up your ProtoNex account in under a minute.</p>
+<div class="auth-error" id="signupError">Please complete all required fields and make sure your passwords match.</div>
+<div class="auth-form-grid">
+<div class="auth-field"><label for="signupName">Full name</label><input id="signupName" type="text" autocomplete="name" placeholder="Your name" required></div>
+<div class="auth-field"><label for="signupCompany">Company <span style="color:var(--muted);font-weight:400">(optional)</span></label><input id="signupCompany" type="text" autocomplete="organization" placeholder="Company name"></div>
+<div class="auth-field"><label for="signupEmail">Work email</label><input id="signupEmail" type="email" autocomplete="email" placeholder="you@company.com" required></div>
+<div class="auth-field"><label for="signupPassword">Password</label><div class="password-row"><input id="signupPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters" minlength="8" required><button type="button" class="password-toggle" data-target="signupPassword">Show</button></div><div class="password-strength"><span id="strengthBar"></span></div></div>
+<div class="auth-field"><label for="signupConfirm">Confirm password</label><div class="password-row"><input id="signupConfirm" type="password" autocomplete="new-password" placeholder="Repeat your password" minlength="8" required><button type="button" class="password-toggle" data-target="signupConfirm">Show</button></div></div>
+<label class="remember" style="align-items:flex-start;font-size:.78rem;line-height:1.45"><input type="checkbox" required style="margin-top:3px"> I agree to the ProtoNex terms and understand how my account information is used.</label>
+<button class="btn btn-light auth-submit" type="submit">Create account ↗</button>
+</div>
+<div class="divider">already a member?</div>
+<p class="auth-bottom" style="margin-top:0"><a class="auth-link" href="login.html">Log in to your existing account</a></p>
+</form></section>
+</div></main>
+<script src="auth.js"></script></body></html>

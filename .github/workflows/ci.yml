@@ -1,0 +1,84 @@
+name: ProtoNex CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: protonex
+          POSTGRES_PASSWORD: protonex
+          POSTGRES_DB: protonex_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U protonex"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://protonex:protonex@localhost:5432/protonex_test?schema=public
+      REDIS_URL: redis://localhost:6379
+      APP_URL: http://localhost:5173
+      API_URL: http://localhost:8787
+      AUTH_SECRET: test-secret-please-ignore-32chars
+      JWT_ACCESS_SECRET: test-secret-please-ignore-32chars
+      JWT_REFRESH_SECRET: test-secret-please-ignore-32chars
+      S3_ENDPOINT: http://localhost:9000
+      S3_BUCKET: protonex-test
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Prisma generate + migrate
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy
+        run: |
+          echo "Configure a deploy step here for your provider (Vercel/Railway/Render/AWS)."
+          echo "Never print secrets. Use the platform's native GitHub integration or a scoped deploy token stored in repo secrets."
