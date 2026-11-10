@@ -40,8 +40,139 @@
 </div></div></section>
 </main>
 <footer class="site-footer container"><span>© 2026 ProtoNex</span><span>Made for prototypes, products & everything between.</span></footer>
-<div class="modal" id="quoteModal" aria-modal="true" role="dialog"><div class="modal-card">
-<div class="modal-head"><div><div class="eyebrow">Fast quote</div><h2>Tell us what you're making.</h2></div><button class="close" aria-label="Close">×</button></div>
-<form id="quoteForm"><div class="form-grid"><div class="field"><label>Name</label><input id="quoteName" name="name" required></div><div class="field"><label>Email</label><input name="email" type="email" required></div><div class="field"><label>Process</label><select id="quoteType" name="type"><option>Metal Cutting</option><option>3D Printing</option></select></div><div class="field"><label>Quantity</label><input name="quantity" type="number" min="1" value="1"></div><div class="field full"><label>Material / finish</label><input name="material" placeholder="e.g. 304 stainless, black PLA"></div><div class="field full"><label>CAD file</label><div class="drop"><strong>Drop your file here</strong><span>or choose one below</span><input id="quoteFile" type="file" style="margin-top:10px"></div></div><div class="field full"><label>Notes</label><textarea name="notes" rows="3" placeholder="Dimensions, tolerances, deadline, finish…"></textarea></div></div><div class="form-foot"><button type="button" class="btn btn-ghost close">Cancel</button><button class="btn btn-light">Continue to email ↗</button></div></form>
+<div class="modal" id="quoteModal" aria-modal="true" role="dialog"><div class="modal-card" style="width:min(680px,100%);">
+<div class="modal-head"><div><div class="eyebrow">Instant Quote & Fabrication Order</div><h2>Tell us what you're making.</h2><p style="color:var(--muted);font-size:.82rem;margin:4px 0 0">Upload your CAD file, get a geometry-calculated quote, and receive the confirmation email with the CAD attached.</p></div><button class="close" aria-label="Close">×</button></div>
+
+<div id="quoteModalBody">
+<form id="quoteForm">
+  <div class="form-grid">
+    <div class="field"><label>Full Name *</label><input id="quoteName" name="name" required placeholder="e.g. Alex Chen"></div>
+    <div class="field"><label>Email Address *</label><input id="quoteEmail" name="email" type="email" required placeholder="alex@college.edu"></div>
+    <div class="field"><label>Phone (Optional)</label><input id="quotePhone" name="phone" placeholder="+91 98765 43210"></div>
+    <div class="field"><label>Quantity</label><input id="quoteQty" name="quantity" type="number" min="1" max="1000" value="1" required></div>
+    
+    <div class="field"><label>Select Process *</label>
+      <select id="quoteType" name="process">
+        <optgroup label="3D Printing (Additive Manufacturing)">
+          <option value="3D Printing - FDM" selected>3D Printing — FDM (Filament / Prototypes)</option>
+          <option value="3D Printing - SLA">3D Printing — SLA (High Precision Resin)</option>
+          <option value="3D Printing - SLS">3D Printing — SLS (Industrial Nylon PA12)</option>
+        </optgroup>
+        <optgroup label="Metal Fabrication (Subtractive)">
+          <option value="Metal Cutting - Laser">Metal Cutting — Fiber Laser Cutting</option>
+          <option value="Metal Cutting - Waterjet">Metal Cutting — Precision Waterjet Cutting</option>
+          <option value="Metal Cutting - Plasma">Metal Cutting — Plasma Cutting</option>
+          <option value="CNC Machining">CNC Machining (Milling / Turning)</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <div class="field"><label>Material</label>
+      <select id="quoteMaterial" name="material">
+        <!-- Dynamically populated or standard defaults -->
+        <option value="PLA">PLA (Polylactic Acid - Standard)</option>
+        <option value="ABS">ABS (Engineering Plastic)</option>
+        <option value="PETG">PETG (Durable & Semi-rigid)</option>
+        <option value="Tough Resin">Tough Resin (High Precision SLA)</option>
+        <option value="SLS Nylon">SLS Nylon (Industrial Mechanical)</option>
+      </select>
+    </div>
+
+    <div class="field"><label>Surface Finish</label>
+      <select id="quoteFinish" name="finish">
+        <option value="As manufactured">As manufactured (Standard)</option>
+        <option value="Bead blasted">Bead blasted (+₹150/unit)</option>
+        <option value="Anodized">Anodized (+₹300/unit)</option>
+        <option value="Powder coated">Powder coated (+₹250/unit)</option>
+        <option value="Vapor smoothed">Vapor smoothed (+₹350/unit)</option>
+      </select>
+    </div>
+
+    <div class="field"><label>Turnaround Speed</label>
+      <select id="quoteDelivery" name="deliverySpeed">
+        <option value="STANDARD">Standard — 5–7 days</option>
+        <option value="RUSH">Rush — 3–4 days (+25%)</option>
+        <option value="EXPRESS">Express — 1–2 days (+50%)</option>
+      </select>
+    </div>
+
+    <div class="field full"><label>Upload CAD Model (.stl, .obj, .step, .stp, .dxf, .3mf)</label>
+      <div class="drop" id="homeDropZone">
+        <strong>Drop your CAD file here</strong>
+        <span>or click to browse from computer</span>
+        <input id="quoteFile" type="file" accept=".stl,.obj,.step,.stp,.dxf,.dwg,.3mf,.iges,.igs,.zip" style="margin-top:10px;display:none;">
+        <button type="button" class="btn btn-ghost btn-small" id="homeBrowseBtn" style="margin-top:10px">Select File</button>
+      </div>
+      <div id="cadAnalysisPill" style="display:none;"></div>
+    </div>
+
+    <div class="field full"><label>Delivery / Fabrication Notes</label>
+      <textarea id="quoteNotes" name="notes" rows="2" placeholder="Tolerances, critical mounting holes, department or lab delivery address…"></textarea>
+    </div>
+  </div>
+
+  <!-- Live Quote Breakdown Card -->
+  <div class="live-quote-card" id="liveQuoteCard">
+    <div class="lq-head">
+      <span class="lq-title">Instant Calculated Quote</span>
+      <span class="lq-total" id="lqTotal">&#8377;1,240</span>
+    </div>
+    <div class="live-quote-breakdown">
+      <div><span>Raw Material:</span><b id="lqMaterial">&#8377;340</b></div>
+      <div><span>Machine Runtime:</span><b id="lqMachine">&#8377;560</b></div>
+      <div><span>Setup & Finish:</span><b id="lqSetup">&#8377;150</b></div>
+      <div><span>GST (18%):</span><b id="lqTax">&#8377;190</b></div>
+    </div>
+    <div style="font-size:.72rem;color:var(--muted);margin-top:8px;text-align:right" id="lqLeadTime">
+      Estimated turnaround: 4 business days
+    </div>
+  </div>
+
+  <div class="form-foot">
+    <button type="button" class="btn btn-ghost close">Cancel</button>
+    <button type="submit" class="btn btn-light" id="btnSubmitOrder">Confirm Order & Send CAD Quote ↗</button>
+  </div>
+</form>
+
+<!-- Success State Container -->
+<div id="orderSuccessView" style="display:none;" class="order-success-box">
+  <div class="order-success-icon">✓</div>
+  <h2 style="font:700 1.8rem var(--display);margin:0 0 8px">Order Placed Successfully!</h2>
+  <div style="font-size:1.1rem;font-weight:700;color:var(--metal);margin-bottom:12px" id="successOrderNumber">#PNX-O-1002</div>
+  <p style="color:var(--muted);max-width:500px;margin:0 auto 18px" id="successOrderDesc">
+    We have received your order. A confirmation email with the complete price quote and your uploaded CAD file has been sent to your inbox.
+  </p>
+  <div class="order-success-actions">
+    <a href="#" class="btn btn-metal" id="btnPreviewSentEmail" target="_blank">View Sent Email Preview ↗</a>
+    <a href="dashboard.html" class="btn btn-light">Go to Dashboard →</a>
+    <button type="button" class="btn btn-ghost" id="btnDoneClose">Done</button>
+  </div>
+</div>
+</div>
 </div></div>
+
+<!-- Generic Email Viewer Modal -->
+<div class="modal" id="emailModal" aria-modal="true" role="dialog">
+  <div class="modal-card" style="width:min(720px,100%);max-height:92vh;padding:20px;">
+    <div class="modal-head">
+      <div>
+        <div class="eyebrow">Transactional Email Proof</div>
+        <h2>Confirmation Email & CAD Attachment</h2>
+      </div>
+      <button class="close" id="emailModalClose">×</button>
+    </div>
+    <div style="margin:14px 0;background:#0d1014;border:1px solid #272d35;border-radius:12px;padding:12px;font-size:.8rem;color:#9da5af;">
+      <div><strong>To:</strong> <span id="emailViewerRecipient">—</span></div>
+      <div><strong>Subject:</strong> <span id="emailViewerSubject">—</span></div>
+      <div><strong>CAD File Attached:</strong> <span id="emailViewerAttachment" style="color:#49d7c2;font-weight:700">—</span></div>
+      <div id="emailViewerEtherealLink" style="margin-top:6px;display:none;">
+        <strong>Web Inbox:</strong> <a id="etherealWebLink" href="#" target="_blank" style="color:#ff6338;text-decoration:underline;">Open Ethereal Mail Link ↗</a>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:12px;overflow:hidden;min-height:420px;border:1px solid #272d35;">
+      <iframe id="emailIframe" style="width:100%;height:440px;border:0;"></iframe>
+    </div>
+  </div>
+</div>
+
 <script src="script.js"></script></body></html>

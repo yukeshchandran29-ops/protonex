@@ -136,16 +136,13 @@ body{animation:pageIn .65s var(--ease-out) both}
   box-shadow:0 12px 40px rgba(0,0,0,.2);
 }
 
-/* Reveal-on-scroll */
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .75s var(--ease-out),transform .75s var(--ease-out)}
-.reveal.is-visible{opacity:1;transform:none}
-.reveal-left{opacity:0;transform:translateX(-30px);transition:opacity .8s var(--ease-out),transform .8s var(--ease-out)}
-.reveal-left.is-visible{opacity:1;transform:none}
-.reveal-scale{opacity:0;transform:scale(.94);transition:opacity .75s var(--ease-out),transform .75s var(--ease-out)}
-.reveal-scale.is-visible{opacity:1;transform:none}
+/* Reveal-on-scroll with safe default visibility */
+.reveal{opacity:1;transform:none;transition:opacity .75s var(--ease-out),transform .75s var(--ease-out)}
+.reveal-left{opacity:1;transform:none;transition:opacity .8s var(--ease-out),transform .8s var(--ease-out)}
+.reveal-scale{opacity:1;transform:none;transition:opacity .75s var(--ease-out),transform .75s var(--ease-out)}
 
-/* Staggered children */
-.stagger > *{opacity:0;transform:translateY(18px);transition:opacity .65s var(--ease-out),transform .65s var(--ease-out)}
+/* Staggered children (defaults to visible so cards are never blank) */
+.stagger > *{opacity:1;transform:none;transition:opacity .65s var(--ease-out),transform .65s var(--ease-out)}
 .stagger.is-visible > *{opacity:1;transform:none}
 .stagger.is-visible > *:nth-child(1){transition-delay:.04s}
 .stagger.is-visible > *:nth-child(2){transition-delay:.10s}
@@ -153,6 +150,12 @@ body{animation:pageIn .65s var(--ease-out) both}
 .stagger.is-visible > *:nth-child(4){transition-delay:.22s}
 .stagger.is-visible > *:nth-child(5){transition-delay:.28s}
 .stagger.is-visible > *:nth-child(6){transition-delay:.34s}
+
+/* Ensure process choice cards and visuals are always fully visible */
+.choice, .choice-art, .plate {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
 
 /* Hero motion */
 .hero-copy h1{
@@ -405,3 +408,113 @@ body{animation:pageIn .65s var(--ease-out) both}
 .geometry-summary b{font-size:.82rem;color:var(--text);font-weight:600}
 @media(max-width:700px){.geometry-summary{grid-template-columns:1fr 1fr}}
 \n\n/* ProtoNex Admin Console */\n.admin-page{max-width:1500px;margin:0 auto;padding:28px 28px 70px}.admin-top{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:26px}.admin-top h1{font:700 clamp(2.2rem,4vw,3.7rem)/.95 var(--display);letter-spacing:-.055em;margin:6px 0}.admin-top p{color:var(--muted);margin:0}.admin-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#15191f;border-radius:999px;padding:8px 12px;font-size:.75rem;color:#b9c1ca}.admin-badge i{width:7px;height:7px;border-radius:50%;background:#62d8a7;box-shadow:0 0 12px #62d8a7}.admin-layout{display:grid;grid-template-columns:310px minmax(0,1fr);gap:18px}.admin-sidebar,.admin-detail,.admin-table-wrap,.admin-card{border:1px solid var(--line);background:#11151a;border-radius:18px}.admin-sidebar{padding:14px;height:max-content;position:sticky;top:86px}.admin-search{width:100%;border:1px solid var(--line);background:#0d1014;color:var(--text);padding:12px 13px;border-radius:11px;outline:none;margin-bottom:12px}.admin-filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.admin-filter{border:1px solid var(--line);background:#171b21;color:#9da6b0;border-radius:999px;padding:7px 10px;font-size:.72rem;cursor:pointer}.admin-filter.active{color:var(--text);border-color:#5c6672;background:#222830}.admin-quote-list{display:grid;gap:7px;max-height:calc(100vh - 230px);overflow:auto;padding-right:2px}.admin-quote-item{border:1px solid transparent;border-radius:13px;padding:13px;cursor:pointer;transition:.25s var(--ease-out);background:#15191f}.admin-quote-item:hover{transform:translateX(3px);border-color:#343c45}.admin-quote-item.selected{border-color:#59636e;background:#1b2027}.admin-quote-item .row{display:flex;justify-content:space-between;gap:8px}.admin-quote-item b{font-size:.84rem}.admin-quote-item small,.admin-quote-item span{display:block;color:#7f8994;font-size:.71rem;margin-top:4px}.admin-status{font-size:.63rem;padding:4px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}.admin-status.submitted{color:#ffd28a}.admin-status.review{color:#ffb09d}.admin-status.approved{color:#83e1bd}.admin-status.rejected{color:#ff9c9c}.admin-detail{padding:22px;min-height:650px}.admin-empty{display:grid;place-items:center;min-height:590px;text-align:center;color:var(--muted)}.admin-empty .auth-mark{margin:0 auto 15px}.admin-detail-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:18px}.admin-detail-head h2{font:700 2rem/1 var(--display);letter-spacing:-.04em;margin:6px 0}.admin-detail-head p{color:var(--muted);margin:0}.admin-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.admin-btn{border:1px solid var(--line);background:#171b21;color:var(--text);padding:10px 13px;border-radius:10px;cursor:pointer;font-weight:600;font-size:.76rem;transition:.2s ease}.admin-btn:hover{transform:translateY(-1px);border-color:#5b6672}.admin-btn.primary{background:#f1f2f3;color:#0c0e11;border-color:#f1f2f3}.admin-btn.danger{color:#ffaaa0}.admin-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:14px;margin-top:18px}.admin-card{padding:17px}.admin-card h3{font:600 1rem var(--display);margin:0 0 14px}.admin-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.admin-kpi{background:#171b21;border:1px solid var(--line);border-radius:12px;padding:12px}.admin-kpi span{font-size:.65rem;color:#7f8994}.admin-kpi b{display:block;margin-top:5px;font:600 1rem var(--display)}.geometry-table{width:100%;border-collapse:collapse}.geometry-table td{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:.77rem}.geometry-table td:last-child{text-align:right;font-weight:600}.admin-field{display:grid;gap:6px;margin-bottom:12px}.admin-field label{font-size:.7rem;color:#8d97a1}.admin-field input,.admin-field select,.admin-field textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);background:#0d1014;color:var(--text);padding:10px 11px;border-radius:9px;outline:none}.admin-field textarea{min-height:100px;resize:vertical}.admin-field input:focus,.admin-field select:focus,.admin-field textarea:focus{border-color:#65717d}.price-editor{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}.price-editor .admin-field{margin:0}.admin-note{padding:10px 12px;border-radius:10px;background:#191e24;border:1px solid var(--line);font-size:.72rem;color:#9ba4ad;line-height:1.5}.cad-list{display:grid;gap:8px}.cad-row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 11px;background:#171b21;border:1px solid var(--line);border-radius:10px}.cad-row b{font-size:.75rem}.cad-row span{font-size:.68rem;color:#7f8994}.admin-table-wrap{overflow:auto;margin-top:18px}.admin-table{width:100%;border-collapse:collapse;min-width:700px}.admin-table th,.admin-table td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);font-size:.74rem}.admin-table th{color:#77818b;font-size:.64rem;text-transform:uppercase;letter-spacing:.08em}.admin-toast{position:fixed;right:20px;bottom:20px;z-index:2000;background:#f1f2f3;color:#0c0e11;border-radius:12px;padding:12px 15px;font-size:.78rem;font-weight:700;box-shadow:0 18px 50px rgba(0,0,0,.3);transform:translateY(20px);opacity:0;pointer-events:none;transition:.35s var(--ease-out)}.admin-toast.show{transform:none;opacity:1}.admin-tab{display:none}.admin-tab.active{display:block}\n@media(max-width:1000px){.admin-layout{grid-template-columns:1fr}.admin-sidebar{position:static}.admin-quote-list{max-height:320px}.admin-grid{grid-template-columns:1fr}}\n@media(max-width:600px){.admin-page{padding:20px 14px 50px}.admin-top{align-items:flex-start;flex-direction:column}.admin-detail{padding:15px}.admin-detail-head{flex-direction:column}.admin-actions{justify-content:flex-start}.admin-kpis{grid-template-columns:1fr 1fr}}\n
+
+
+/* Instant CAD Quote & Order Modal Styles (College Edition) */
+.cad-analysis-pill {
+  background: #171d24;
+  border: 1px solid #2a3440;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 12px 0;
+  display: grid;
+  gap: 8px;
+}
+.cad-analysis-pill .pill-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cad-analysis-pill .pill-title {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.9rem;
+}
+.cad-analysis-pill .pill-tag {
+  background: rgba(73, 215, 194, 0.15);
+  color: #49d7c2;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+.cad-metrics-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.78rem;
+  color: #9da6b0;
+  border-top: 1px solid #252e38;
+  padding-top: 8px;
+}
+.cad-metrics-row span b {
+  color: #f4f1eb;
+}
+
+.live-quote-card {
+  background: linear-gradient(145deg, rgba(255, 99, 56, 0.08), #12161c 65%);
+  border: 1px solid rgba(255, 99, 56, 0.35);
+  border-radius: 16px;
+  padding: 18px;
+  margin: 14px 0;
+}
+.live-quote-card .lq-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+.live-quote-card .lq-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--metal);
+  font-weight: 700;
+}
+.live-quote-card .lq-total {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-family: var(--display);
+  color: #49d7c2;
+}
+.live-quote-breakdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  font-size: 0.78rem;
+  color: #9da6b0;
+  border-top: 1px solid #252e38;
+  padding-top: 10px;
+}
+.live-quote-breakdown div {
+  display: flex;
+  justify-content: space-between;
+}
+.live-quote-breakdown div b {
+  color: #f4f1eb;
+}
+
+.order-success-box {
+  text-align: center;
+  padding: 24px 10px;
+}
+.order-success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(73, 215, 194, 0.15);
+  color: #49d7c2;
+  font-size: 1.6rem;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 16px;
+  border: 1px solid #49d7c2;
+}
+.order-success-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}

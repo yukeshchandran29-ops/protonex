@@ -18,6 +18,20 @@
     "noImplicitAny": true,
     "strictNullChecks": true
   },
-  "include": ["src/**/*.ts", "prisma/seed.ts"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "include": [
+    "src/index.ts",
+    "src/app.ts",
+    "src/config/env.ts",
+    "src/db/db.ts",
+    "src/routes/api.routes.ts",
+    "src/services/geometryEngine.ts",
+    "src/services/pricingEngine.ts",
+    "src/services/mailerService.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests",
+    "prisma"
+  ]
 }

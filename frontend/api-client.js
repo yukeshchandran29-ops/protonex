@@ -1,5 +1,5 @@
-// ProtoNex API client — thin fetch wrapper shared by dashboard.js and admin.js.
-// Talks to the real backend; every call sends the HttpOnly session cookie.
+// ProtoNex API client — shared by dashboard.js, admin.js, and script.js.
+// Connects to local ProtoNex API endpoints.
 const ProtoNexAPI = (() => {
   const BASE = '/api';
 
@@ -31,8 +31,6 @@ const ProtoNexAPI = (() => {
     listProjects: () => request('GET', '/projects'),
     createProject: (data) => request('POST', '/projects', data),
 
-    requestUpload: (data) => request('POST', '/cad-files/request-upload', data),
-    confirmUpload: (data) => request('POST', '/cad-files/confirm-upload', data),
     getCadFile: (id) => request('GET', `/cad-files/${id}`),
     listCadFiles: () => request('GET', '/cad-files'),
 
@@ -45,68 +43,48 @@ const ProtoNexAPI = (() => {
     getQuotePdf: (id) => request('GET', `/quotes/${id}/pdf`),
 
     listOrders: () => request('GET', '/orders'),
+    getOrder: (id) => request('GET', `/orders/${id}`),
 
     pricingOptions: () => request('GET', '/pricing/options'),
     priceEstimate: (data) => request('POST', '/pricing/estimate', data),
 
     adminDashboard: () => request('GET', '/admin/dashboard'),
 
-    /** Uploads a file directly to object storage via a presigned URL — never through our API. */
+    /** Direct local multipart upload to /api/upload */
     async uploadCadFile(projectId, file, onProgress) {
-      const { cadFileId, uploadUrl } = await this.requestUpload({
-        projectId,
-        fileName: file.name,
-        fileSize: file.size,
-        contentType: file.type || 'application/octet-stream',
-      });
+      const fd = new FormData();
+      fd.append('file', file);
+      if (projectId) fd.append('projectId', projectId);
 
-      await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', uploadUrl);
-        xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
-        xhr.upload.onprogress = (e) => onProgress && e.lengthComputable && onProgress(e.loaded / e.total);
-        xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error('Upload failed')));
-        xhr.onerror = () => reject(new Error('Upload failed'));
-        xhr.send(file);
-      });
+      if (onProgress) onProgress(0.5);
 
-      const checksum = await sha256Hex(file);
-      return this.confirmUpload({ cadFileId, checksum });
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: fd,
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json?.error?.message || 'Upload failed');
+      }
+      if (onProgress) onProgress(1.0);
+      return json.data;
     },
 
-    /** Polls a CAD file until geometry analysis finishes (or fails), used right after upload. */
-    async pollGeometry(cadFileId, { intervalMs = 1500, timeoutMs = 60000 } = {}) {
-      const start = Date.now();
-      while (Date.now() - start < timeoutMs) {
-        const file = await this.getCadFile(cadFileId);
-        if (file.geometryStatus === 'COMPLETE' || file.geometryStatus === 'FAILED') return file;
-        await new Promise((r) => setTimeout(r, intervalMs));
-      }
+    /** In local mode, CAD geometry analysis runs synchronously on upload */
+    async pollGeometry(cadFileId) {
       return this.getCadFile(cadFileId);
     },
   };
-
-  async function sha256Hex(file) {
-    const buf = await file.arrayBuffer();
-    const hash = await crypto.subtle.digest('SHA-256', buf);
-    return [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, '0')).join('');
-  }
 })();
 
 /**
- * Auth guard for protected pages. Call at the top of dashboard.js / admin.js.
- * `allowedRoles` omitted = any authenticated user; pass e.g. ['ENGINEER','ADMIN'] for staff-only pages.
+ * Auth guard for dashboard. In College Edition, automatically falls back to demo account.
  */
 async function protoNexRequireAuth(allowedRoles) {
   try {
     const user = await ProtoNexAPI.me();
-    if (allowedRoles && !allowedRoles.includes(user.role)) {
-      window.location.href = 'dashboard.html';
-      return null;
-    }
-    return user;
+    return user || { id: 'usr_demo_01', name: 'Prototype Lab', role: 'CUSTOMER', email: 'demo@protonex.local' };
   } catch {
-    window.location.href = 'login.html';
-    return null;
+    return { id: 'usr_demo_01', name: 'Prototype Lab', role: 'CUSTOMER', email: 'demo@protonex.local' };
   }
 }

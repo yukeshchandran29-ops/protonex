@@ -4,47 +4,39 @@ import { z } from 'zod';
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().default(8787),
-  APP_URL: z.string().url(),
-  API_URL: z.string().url(),
+  APP_URL: z.string().default('http://localhost:8787'),
+  API_URL: z.string().default('http://localhost:8787'),
 
-  DATABASE_URL: z.string().min(1),
+  // Email configuration (optional - falls back to Ethereal test inbox)
+  SMTP_HOST: z.string().default(''),
+  SMTP_PORT: z.coerce.number().default(587),
+  SMTP_USER: z.string().default(''),
+  SMTP_PASS: z.string().default(''),
+  SMTP_FROM: z.string().default('ProtoNex <quotes@protonex.local>'),
 
-  AUTH_SECRET: z.string().min(16),
-  JWT_ACCESS_SECRET: z.string().min(16),
-  JWT_REFRESH_SECRET: z.string().min(16),
-  JWT_ACCESS_TTL: z.string().default('15m'),
-  JWT_REFRESH_TTL: z.string().default('30d'),
-  COOKIE_SECURE: z
-    .string()
-    .default('false')
-    .transform((v) => v === 'true'),
-
-  S3_ENDPOINT: z.string().min(1),
-  S3_REGION: z.string().default('auto'),
-  S3_BUCKET: z.string().min(1),
-  S3_ACCESS_KEY_ID: z.string().default(''),
-  S3_SECRET_ACCESS_KEY: z.string().default(''),
-  S3_FORCE_PATH_STYLE: z
-    .string()
-    .default('true')
-    .transform((v) => v === 'true'),
-
-  RESEND_API_KEY: z.string().default(''),
-  EMAIL_FROM: z.string().default('ProtoNex <quotes@protonex.example>'),
-
-  REDIS_URL: z.string().default('redis://localhost:6379'),
-
-  PYTHON_BIN: z.string().default('python3'),
+  // Optional Python binary for complex STEP geometry
+  PYTHON_BIN: z.string().default('python'),
 });
 
 const parsed = schema.safeParse(process.env);
 
 if (!parsed.success) {
-  // Fail fast and loudly at boot rather than at first request.
-  // eslint-disable-next-line no-console
-  console.error('Invalid environment configuration:', parsed.error.flatten().fieldErrors);
-  process.exit(1);
+  console.warn('Environment warning:', parsed.error.flatten().fieldErrors);
 }
 
-export const env = parsed.data;
+export const env = parsed.success
+  ? parsed.data
+  : {
+      NODE_ENV: 'development' as const,
+      PORT: 8787,
+      APP_URL: 'http://localhost:8787',
+      API_URL: 'http://localhost:8787',
+      SMTP_HOST: '',
+      SMTP_PORT: 587,
+      SMTP_USER: '',
+      SMTP_PASS: '',
+      SMTP_FROM: 'ProtoNex <quotes@protonex.local>',
+      PYTHON_BIN: 'python',
+    };
+
 export const isProd = env.NODE_ENV === 'production';

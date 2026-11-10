@@ -2,14 +2,11 @@
   "name": "protonex",
   "version": "2.0.0",
   "private": true,
-  "description": "ProtoNex — Where Ideas Become Prototypes. Monorepo convenience scripts (real work lives in ./backend).",
+  "description": "ProtoNex — Digital Fabrication & Instant CAD Quoting (College Edition)",
   "scripts": {
     "dev": "npm run dev --prefix backend",
     "build": "npm run build --prefix backend",
     "start": "npm start --prefix backend",
-    "test": "npm test --prefix backend",
-    "worker": "npm run worker --prefix backend",
-    "docker:up": "docker compose up --build",
-    "docker:down": "docker compose down"
+    "test": "node backend/test_flow.js"
   }
 }

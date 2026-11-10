@@ -3,7 +3,7 @@ const $$ = s => [...document.querySelectorAll(s)];
 
 const state = { user: null, projects: [], quotes: [], files: [], orders: [] };
 const toast = msg => { const el = $('#dashToast'); el.textContent = msg; el.classList.add('show'); clearTimeout(window.__toast); window.__toast = setTimeout(() => el.classList.remove('show'), 2600); };
-function money(v) { return '$' + Number(v || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function money(v) { return '₹' + Number(v || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function formatSize(n) { if (n < 1024) return n + ' B'; if (n < 1024 * 1024) return Math.round(n / 1024) + ' KB'; return (n / 1024 / 1024).toFixed(1) + ' MB'; }
 function formatDate(d) { return d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'; }
 function niceStatus(s) { return String(s || '').replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
@@ -130,6 +130,9 @@ function renderFiles() {
       <b title="${f.originalName}">${f.originalName}</b>
       <span>${formatSize(f.fileSize)} • ${formatDate(f.createdAt)}</span>
       <small class="geometry-status ${f.geometryStatus === 'COMPLETE' ? 'ready' : f.geometryStatus === 'PROCESSING' ? 'analyzing' : 'unavailable'}">${niceStatus(f.geometryStatus)}</small>
+      <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+        <a href="/api/cad-files/${f.id}/download" class="text-btn" style="color:var(--metal);font-size:.72rem;">⬇ Download</a>
+      </div>
     </article>`).join('') : `<div style="padding:24px;color:#7f8994;font-size:.85rem">No CAD files uploaded yet.</div>`;
 }
 
@@ -138,13 +141,27 @@ function renderOrders() {
   const stepIndex = { QUEUED: 1, IN_PRODUCTION: 2, QUALITY_CHECK: 3, READY_TO_SHIP: 4, COMPLETE: 4 };
   $('#orderList').innerHTML = state.orders.length ? state.orders.map(o => {
     const step = stepIndex[o.productionStatus] || 1;
+    const material = o.quote?.material || 'Custom Material';
+    const total = money(o.totalAmount || (o.quote?.finalPrice ?? o.quote?.estimatedPrice ?? 0));
+    const previewUrl = o.emailPreviewUrl || `/api/orders/${o.id}/email-preview`;
+
     return `<article class="order-card">
       <div class="order-head">
-        <div><div class="order-number">${o.orderNumber}</div><h3>${o.quote?.material || 'Order'} — ${o.items?.length || 0} item(s)</h3><p>${niceStatus(o.quote?.process)}</p></div>
-        <span class="status ${o.shippingStatus === 'DELIVERED' ? 'complete' : step >= 3 ? 'review' : 'active'}">${niceStatus(o.shippingStatus === 'NOT_SHIPPED' ? o.productionStatus : o.shippingStatus)}</span>
+        <div>
+          <div class="order-number">${o.orderNumber} &bull; <strong style="color:var(--print)">${total}</strong></div>
+          <h3>${material} — ${o.customerName || 'Prototype'}</h3>
+          <p>${niceStatus(o.quote?.process || 'Fabrication')} &bull; Sent to ${o.customerEmail}</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <a href="${previewUrl}" target="_blank" class="btn btn-ghost btn-small" style="font-size:.75rem;padding:6px 10px;">📧 View Sent Email</a>
+          <span class="status ${o.shippingStatus === 'DELIVERED' ? 'complete' : step >= 3 ? 'review' : 'active'}">${niceStatus(o.shippingStatus === 'NOT_SHIPPED' ? o.productionStatus : o.shippingStatus)}</span>
+        </div>
       </div>
       <div class="order-track">${labels.map((l, i) => `<div class="track-step ${i + 1 <= step ? 'done' : ''} ${i + 1 === step ? 'current' : ''}">${l}</div>`).join('')}</div>
-      <div class="project-meta" style="margin-top:12px"><span>Tracking <b>${o.trackingNumber || 'Pending'}</b></span></div>
+      <div class="project-meta" style="margin-top:12px">
+        <span>Attached CAD: <b>${o.cadFile?.originalName || 'CAD Model'}</b></span>
+        <span>Tracking <b>${o.trackingNumber || 'PNX-TRK-' + o.orderNumber.slice(-4)}</b></span>
+      </div>
     </article>`;
   }).join('') : `<div style="padding:24px;color:#7f8994;font-size:.85rem">No orders yet.</div>`;
 }
@@ -241,14 +258,17 @@ async function loadPricingOptions() {
   return quoteBuilder.pricingOptions;
 }
 
-const processMap = { '3D Printing': ['FDM_3D_PRINTING', 'SLA_3D_PRINTING', 'SLS_3D_PRINTING'], 'Metal Cutting': ['CNC_MACHINING', 'SHEET_METAL', 'LASER_CUTTING'] };
-
 async function updateMaterials() {
   const options = await loadPricingOptions();
-  const processGroup = $('#quoteProcess').value;
-  const validProcesses = processMap[processGroup] || [];
-  const materials = options.materials.filter(m => validProcesses.includes(m.process));
-  $('#quoteMaterial').innerHTML = materials.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+  const processGroup = $('#quoteProcess')?.value || '3D Printing';
+  const is3D = processGroup.toLowerCase().includes('3d') || processGroup.toLowerCase().includes('print');
+  const materials = options.materials.filter(m => {
+    const mIs3D = m.process.toLowerCase().includes('3d') || m.process.toLowerCase().includes('print');
+    return is3D === mIs3D;
+  });
+  if ($('#quoteMaterial')) {
+    $('#quoteMaterial').innerHTML = materials.map(m => `<option value="${m.name}">${m.name} (${m.description || m.category})</option>`).join('');
+  }
   calculateEstimate();
 }
 
@@ -258,8 +278,7 @@ function calculateEstimate() {
   estimateTimer = setTimeout(async () => {
     const form = $('#dashboardQuoteForm');
     if (!form) return;
-    const processGroup = form.process.value;
-    const process = (processMap[processGroup] || ['FDM_3D_PRINTING'])[0];
+    const processGroup = form.process.value || '3D Printing';
     const quantity = Math.max(1, Number(form.quantity.value || 1));
     const material = form.material.value;
     if (!material) return;
@@ -268,7 +287,9 @@ function calculateEstimate() {
     try {
       const breakdown = await ProtoNexAPI.priceEstimate({
         cadFileId: readyFile?.cadFileId || undefined,
-        process, material, quantity,
+        process: processGroup,
+        material,
+        quantity,
         deliverySpeed: (form.delivery.value.includes('Rush') ? 'RUSH' : form.delivery.value.includes('Express') ? 'EXPRESS' : 'STANDARD'),
       });
       $('#quoteEstimate').textContent = money(breakdown.estimatedPrice);
@@ -343,8 +364,7 @@ $('#dashboardQuoteForm').addEventListener('submit', async e => {
 
   const submit = $('#quoteSubmit'); submit.disabled = true; submit.textContent = 'Submitting…';
   try {
-    const processGroup = data.get('process');
-    const process = (processMap[processGroup] || ['FDM_3D_PRINTING'])[0];
+    const process = data.get('process') || '3D Printing';
     const deliverySpeed = data.get('delivery').includes('Rush') ? 'RUSH' : data.get('delivery').includes('Express') ? 'EXPRESS' : 'STANDARD';
     const quote = await ProtoNexAPI.createQuote({
       projectId: quoteBuilder.projectId,

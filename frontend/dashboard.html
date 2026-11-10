@@ -68,10 +68,41 @@
 <section class="quote-stage active" data-stage="1">
   <div class="quote-drop" id="quoteDrop"><input id="quoteCadInput" type="file" multiple accept=".step,.stp,.stl,.obj,.iges,.igs,.dxf,.dwg,.3mf,.zip" hidden><div class="upload-icon">↑</div><b>Drop your CAD files here</b><span>STEP, STP, STL, IGES, DXF, DWG, 3MF or ZIP · up to 100 MB each</span><button type="button" class="btn btn-ghost btn-small" id="browseQuoteCad">Browse files</button></div>
   <div id="quoteFileList" class="quote-file-list"></div>
-  <div class="form-grid"><div class="field"><label>Project name</label><input name="project" required placeholder="e.g. Enclosure V2"></div><div class="field"><label>Quantity</label><input name="quantity" type="number" min="1" max="10000" value="1" required></div></div>
+  <div class="form-grid">
+    <div class="field"><label>Project name *</label><input name="project" required placeholder="e.g. Enclosure V2"></div>
+    <div class="field"><label>Quantity *</label><input name="quantity" type="number" min="1" max="10000" value="1" required></div>
+    <div class="field full"><label>Select Fabrication Process *</label>
+      <select name="process" id="quoteProcess">
+        <optgroup label="3D Printing (Additive Manufacturing)">
+          <option value="3D Printing" selected>3D Printing — FDM / SLA / SLS</option>
+        </optgroup>
+        <optgroup label="Metal Fabrication (Subtractive)">
+          <option value="Metal Cutting">Metal Cutting — Laser / Waterjet / Plasma / CNC</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
 </section>
 <section class="quote-stage" data-stage="2">
-  <div class="form-grid"><div class="field"><label>Manufacturing process</label><select name="process" id="quoteProcess"><option value="3D Printing">3D Printing</option><option value="Metal Cutting">Metal Cutting</option></select></div><div class="field"><label>Material</label><select name="material" id="quoteMaterial"></select></div><div class="field"><label>Finish</label><select name="finish"><option>As manufactured</option><option>Bead blasted</option><option>Anodized</option><option>Powder coated</option><option>Vapor smoothed</option></select></div><div class="field"><label>Target delivery</label><select name="delivery"><option>Standard — 5–7 business days</option><option>Rush — 3–4 business days</option><option>Express — 1–2 business days</option></select></div><div class="field"><label>Tolerance</label><select name="tolerance"><option>Standard</option><option>Precision ±0.10 mm</option><option>Precision ±0.05 mm</option></select></div><div class="field"><label>Part complexity</label><select name="complexity"><option value="1">Standard geometry</option><option value="1.25">Complex geometry</option><option value="1.5">Highly complex / tight features</option></select></div><div class="field full"><label>Production notes</label><textarea name="notes" rows="3" placeholder="Critical dimensions, threads, inserts, inspection requirements, packaging…"></textarea></div></div>
+  <div class="form-grid">
+    <div class="field"><label>Fabrication Method</label>
+      <select name="processMethod" id="quoteProcessMethod">
+        <option value="FDM">FDM (Fused Deposition Modeling)</option>
+        <option value="SLA">SLA (High Precision Resin)</option>
+        <option value="SLS">SLS (Selective Laser Sintering)</option>
+        <option value="Laser Cutting">Laser Cutting (Sheet Metal)</option>
+        <option value="Waterjet">Waterjet Cutting</option>
+        <option value="Plasma">Plasma Cutting</option>
+        <option value="CNC Machining">CNC Machining</option>
+      </select>
+    </div>
+    <div class="field"><label>Material *</label><select name="material" id="quoteMaterial"></select></div>
+    <div class="field"><label>Finish</label><select name="finish"><option>As manufactured</option><option>Bead blasted</option><option>Anodized</option><option>Powder coated</option><option>Vapor smoothed</option></select></div>
+    <div class="field"><label>Target delivery</label><select name="delivery"><option>Standard — 5–7 business days</option><option>Rush — 3–4 business days</option><option>Express — 1–2 business days</option></select></div>
+    <div class="field"><label>Tolerance</label><select name="tolerance"><option>Standard</option><option>Precision ±0.10 mm</option><option>Precision ±0.05 mm</option></select></div>
+    <div class="field"><label>Part complexity</label><select name="complexity"><option value="1">Standard geometry</option><option value="1.25">Complex geometry</option><option value="1.5">Highly complex / tight features</option></select></div>
+    <div class="field full"><label>Production notes</label><textarea name="notes" rows="3" placeholder="Critical dimensions, threads, inserts, inspection requirements, packaging…"></textarea></div>
+  </div>
 </section>
 <section class="quote-stage" data-stage="3">
   <div class="geometry-summary" id="geometrySummary"><div><span>Analyzed</span><b>0/0 files</b></div><div><span>Model volume</span><b>—</b></div><div><span>Surface area</span><b>—</b></div><div><span>Largest envelope</span><b>—</b></div></div><div class="quote-review-grid"><div class="review-card"><div class="eyebrow">Request summary</div><div id="quoteReview"></div></div><div class="estimate-card"><div class="eyebrow">Indicative estimate</div><strong id="quoteEstimate">₹0</strong><span id="quoteEstimateMeta">Final price follows CAD/DFM review.</span><div class="estimate-bar"><span id="estimateBar"></span></div></div></div>
