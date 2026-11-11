@@ -1,37 +1,37 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "lib": ["ES2022"],
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": false,
-    "sourceMap": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitAny": true,
-    "strictNullChecks": true
-  },
-  "include": [
-    "src/index.ts",
-    "src/app.ts",
-    "src/config/env.ts",
-    "src/db/db.ts",
-    "src/routes/api.routes.ts",
-    "src/services/geometryEngine.ts",
-    "src/services/pricingEngine.ts",
-    "src/services/mailerService.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "tests",
-    "prisma"
-  ]
+"compilerOptions": {
+  "target": "ES2022",
+"module": "Node16",
+"moduleResolution": "Node16",
+  "lib": ["ES2022"],
+  "outDir": "dist",
+  "rootDir": "src",
+  "strict": true,
+  "esModuleInterop": true,
+  "skipLibCheck": true,
+  "forceConsistentCasingInFileNames": true,
+  "resolveJsonModule": true,
+  "declaration": false,
+  "sourceMap": true,
+  "noUnusedLocals": false,
+  "noUnusedParameters": false,
+  "noImplicitAny": true,
+  "strictNullChecks": true
+},
+"include": [
+  "src/index.ts",
+  "src/app.ts",
+  "src/config/env.ts",
+  "src/db/db.ts",
+  "src/routes/api.routes.ts",
+  "src/services/geometryEngine.ts",
+  "src/services/pricingEngine.ts",
+  "src/services/mailerService.ts"
+],
+"exclude": [
+  "node_modules",
+  "dist",
+  "tests",
+  "prisma"
+]
 }
