@@ -4,7 +4,7 @@ import { env } from '../config/env';
 
 // Single shared connection; BullMQ manages its own internal connections per queue/worker
 // but we centralize the URL/config here.
-export const connection = new IORedis(env.REDIS_URL, { maxRetriesPerRequest: null });
+export const connection = new IORedis(env.REDIS_URL ?? 'redis://localhost:6379', { maxRetriesPerRequest: null });
 
 export const cadAnalysisQueue = new Queue('CAD_ANALYSIS', { connection });
 export const quoteCalculationQueue = new Queue('QUOTE_CALCULATION', { connection });

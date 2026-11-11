@@ -40,7 +40,7 @@ export interface PricingSnapshot {
  * never retroactively alter an already-issued quote.
  */
 export async function calculateQuote(
-  geometry: GeometryResult | null,
+  geometry: { ok: boolean; volume?: number; surfaceArea?: number; complexityScore?: number } | null,
   config: PricingConfiguration
 ): Promise<{ breakdown: PricingBreakdown; snapshot: PricingSnapshot }> {
   const material = await prisma.material.findUnique({ where: { name: config.materialName } });

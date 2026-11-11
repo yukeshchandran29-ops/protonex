@@ -10,7 +10,7 @@ export const notFoundHandler = (req: Request, res: Response) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const errorHandler = (err: unknown, req: Request, res: Response, _next: NextFunction) => {
-  const requestId = req.headers['x-request-id'] || req.id;
+  const requestId = req.headers['x-request-id'] || (req as any).id;
 
   if (err instanceof ZodError) {
     logger.warn({ requestId, issues: err.issues }, 'Validation error');

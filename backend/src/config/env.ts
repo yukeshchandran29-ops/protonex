@@ -16,6 +16,19 @@ const schema = z.object({
 
   // Optional Python binary for complex STEP geometry
   PYTHON_BIN: z.string().default('python'),
+
+  // Additional optional environment variables used throughout the codebase
+  REDIS_URL: z.string().optional().default('redis://localhost:6379'),
+  JWT_ACCESS_SECRET: z.string().optional().default('dev-secret'),
+  JWT_ACCESS_TTL: z.coerce.number().optional().default(3600),
+  RESEND_API_KEY: z.string().optional().default(''),
+  EMAIL_FROM: z.string().optional().default('no-reply@protonex.local'),
+  S3_ENDPOINT: z.string().optional().default(''),
+  S3_REGION: z.string().optional().default(''),
+  S3_FORCE_PATH_STYLE: z.string().optional().default('false'),
+  S3_ACCESS_KEY_ID: z.string().optional().default(''),
+  S3_SECRET_ACCESS_KEY: z.string().optional().default(''),
+  S3_BUCKET: z.string().optional().default(''),
 });
 
 const parsed = schema.safeParse(process.env);
@@ -37,6 +50,19 @@ export const env = parsed.success
       SMTP_PASS: '',
       SMTP_FROM: 'ProtoNex <quotes@protonex.local>',
       PYTHON_BIN: 'python',
+      REDIS_URL: 'redis://localhost:6379',
+      JWT_ACCESS_SECRET: 'dev-secret',
+      JWT_ACCESS_TTL: 3600,
+      RESEND_API_KEY: '',
+      EMAIL_FROM: 'no-reply@protonex.local',
+      S3_ENDPOINT: '',
+      S3_REGION: '',
+      S3_FORCE_PATH_STYLE: 'false',
+      S3_ACCESS_KEY_ID: '',
+      S3_SECRET_ACCESS_KEY: '',
+      S3_BUCKET: '',
     };
 
 export const isProd = env.NODE_ENV === 'production';
+
+

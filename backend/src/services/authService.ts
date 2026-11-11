@@ -22,11 +22,11 @@ export const authService = {
   },
 
   signAccessToken(payload: AccessTokenPayload): string {
-    return jwt.sign(payload, env.JWT_ACCESS_SECRET, { expiresIn: env.JWT_ACCESS_TTL });
+    return jwt.sign(payload, env.JWT_ACCESS_SECRET ?? 'dev-secret', { expiresIn: env.JWT_ACCESS_TTL ?? 3600 });
   },
 
   verifyAccessToken(token: string): AccessTokenPayload {
-    return jwt.verify(token, env.JWT_ACCESS_SECRET) as AccessTokenPayload;
+    return jwt.verify(token, env.JWT_ACCESS_SECRET ?? 'dev-secret') as AccessTokenPayload;
   },
 
   /** Refresh tokens are opaque random strings; only their hash is stored (like a password). */
