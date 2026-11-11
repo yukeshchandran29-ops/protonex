@@ -9,26 +9,24 @@ export function createApp() {
   const app = express();
 
   // Allowed frontend origins
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'https://YOUR-PROJECT.vercel.app'
-  ];
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'https://protonex-frontend.vercel.app',
+];
 
-  // Production CORS configuration
-  app.use(cors({
-    origin: (origin, callback) => {
-      // Allow requests without an Origin header
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
 
-      return callback(new Error(`CORS blocked origin: ${origin}`));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-  }));
+    return callback(new Error(`CORS blocked origin: ${origin}`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
   // Request parsing
   app.use(express.json({ limit: '25mb' }));
